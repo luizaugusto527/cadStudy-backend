@@ -1,50 +1,75 @@
 package com.cadstudy.study.controllers;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Optional;
 
 import com.cadstudy.study.entity.Student;
+import com.cadstudy.study.repository.StudentRpository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/students")
 @CrossOrigin
 public class StudentController {
 
+    @Autowired
+    private StudentRpository repo;
+
     // End Point 1 (GET)
     
     @GetMapping
     public List<Student> getStudent(){
-       Student s1 = new Student();
-       Student s2 = new Student();
-
         
-       s1.setId(1);
-        s1.setNome("Luiz");
-        s1.setIdade(27);
-        s1.setCidade("Sorocaba");
-        s1.setEmail("luiz@gmail.com");
-        s1.setSemestre("3");
-        String curso = "Anásise e desenvolvimento de sistemas";
-        s1.setCurso(curso);
-        
-        s2.setId (2);
-        s2.setNome("Mariana");
-        s2.setIdade(23);
-        s2.setCidade("Itu");
-        s2.setEmail("mariana@gmail.com");
-        s2.setSemestre("7");
-         curso = "Direito";
-        s2.setCurso(curso);
-        
-        ArrayList<Student> list  = new ArrayList<>();
-        list.add(s1);
-        list.add(s2);
+        List<Student> list = repo.findAll();
 
         return list;
     }
+    // End Point 2 (POST)
+    @PostMapping
+
+    public Student createStudent(@RequestBody Student student){
+        student = repo.save(student);
+        return student;
+    }
+
+    // End Point 3 (PUT)
+    @PutMapping("{id}")
+    public Student alterarStudent (@RequestBody Student updateStudent,@PathVariable int id){
+        Optional<Student> op = repo.findById(id);
+        Student student = op.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        student.setNome(updateStudent.getNome());
+        student.setIdade(updateStudent.getIdade());
+        student.setCurso(updateStudent.getCurso());
+        student.setCidade(updateStudent.getCidade());
+        student.setSemestre(updateStudent.getSemestre());
+        student.setEmail(updateStudent.getEmail());
+        repo.save(student);
+        return student;
+    }
+
+    // End Point 4 (DELETE)
+
+    @DeleteMapping("{id}")
+    public Student excluir (@PathVariable Integer id){
+        Optional<Student> op = repo.findById(id);
+        Student student = op.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        repo.delete(student);
+        return student;
+        
+    }
+
+
 }
