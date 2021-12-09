@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.cadstudy.study.entity.Student;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
+@CrossOrigin
 public class StudentController {
 
     // End Point 1 (GET)
@@ -40,6 +42,9 @@ public class StudentController {
         s2.setCurso(curso);
         
         ArrayList<Student> list  = new ArrayList<>();
+        list.add(s1);
+        list.add(s2);
+
         return list;
     }
 }
